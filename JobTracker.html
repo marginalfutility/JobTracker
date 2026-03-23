@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Niral · Job Search</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0e0f11; --surface:#16181c; --surface2:#1e2127; --surface3:#262b33;
+  --border:#2e333d; --border2:#3a414f;
+  --text:#e8eaf0; --text2:#9aa0ae; --text3:#5e6676;
+  --accent:#c8f53c; --red:#ff5a5f; --orange:#ff9f43;
+  --blue:#5b8fff; --purple:#a78bfa; --green:#4ade80; --teal:#2dd4bf;
+  --t1:#c8f53c; --t2:#5b8fff; --t3:#a78bfa; --tc:#ff9f43; --tn:#9aa0ae;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh}
+/* HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:200}
+.logo{font-family:'DM Serif Display',serif;font-size:21px;color:var(--accent)}
+.hdr-sub{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-left:10px}
+.hdr-stats{display:flex;gap:18px}
+.stat{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace}
+.stat b{color:var(--text)}
+/* TABS */
+.tabs{display:flex;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border)}
+.tab{padding:11px 18px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:.15s;user-select:none}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+/* CONTENT */
+.content{padding:24px;max-width:1400px;margin:0 auto}
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;align-items:start}
+.col-head{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);padding:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+.col-head span{background:var(--surface3);color:var(--text2);font-size:10px;padding:1px 6px;border-radius:10px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--border2)}
+.card-co{font-weight:500;font-size:13px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-role{font-size:12px;color:var(--text2);margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.dot-contact{width:6px;height:6px;border-radius:50%;background:var(--blue);margin-left:auto;flex-shrink:0}
+/* LIST */
+.list-tbl{width:100%;border-collapse:collapse}
+.list-tbl th{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.list-tbl td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.list-tbl tr:hover td{background:var(--surface2)}
+.list-tbl tr.archived td{opacity:.4}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:12px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto}
+.modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-title{font-family:'DM Serif Display',serif;font-size:18px}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:2px 6px;border-radius:4px}
+.modal-close:hover{color:var(--text);background:var(--surface3)}
+.modal-body{padding:20px 24px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--border2)}
+.field textarea{resize:vertical;min-height:80px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:8px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:.15s;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--accent);color:#0e0f11}
+.btn-primary:hover{background:#b8e030}
+.btn-ghost{background:var(--surface3);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red)}
+.btn-danger:hover{background:rgba(255,90,95,.1)}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.log-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.log-date{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:2px}
+.log-add{display:flex;gap:8px;margin-top:10px}
+.log-add input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+/* OUTREACH TAB */
+.outreach-layout{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+.outreach-list{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.outreach-list-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.outreach-list-head h3{font-size:14px;font-weight:500}
+.oitem{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.oitem:last-child{border-bottom:none}
+.oitem:hover{background:var(--surface2)}
+.oitem.selected{background:var(--surface2);border-left:2px solid var(--accent)}
+.oitem-co{font-weight:500;font-size:13px}
+.oitem-name{font-size:12px;color:var(--text2);margin-top:1px}
+.oitem-meta{display:flex;gap:6px;margin-top:6px;align-items:center}
+.oitem-since{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:auto}
+/* CHAT PANE */
+.chat-pane{background:var(--surface);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;height:600px}
+.chat-head{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.chat-head h3{font-size:14px;font-weight:500;color:var(--accent)}
+.chat-head p{font-size:12px;color:var(--text3);margin-top:2px}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:90%;font-size:13px;line-height:1.55;padding:9px 12px;border-radius:8px}
+.chat-msg.user{background:var(--surface3);align-self:flex-end;color:var(--text)}
+.chat-msg.ai{background:var(--surface2);border:1px solid var(--border);align-self:flex-start;color:var(--text)}
+.chat-msg.ai.thinking{color:var(--text3);font-style:italic}
+.chat-input-row{padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+.chat-input-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+.chat-input-row input:focus{border-color:var(--border2)}
+.chat-send{background:var(--accent);border:none;border-radius:6px;padding:8px 14px;color:#0e0f11;font-weight:500;font-size:13px;cursor:pointer}
+.chat-send:hover{background:#b8e030}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--text);z-index:999;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+/* DETAIL PANEL */
+.detail-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px}
+.detail-panel h3{font-size:15px;font-weight:500;margin-bottom:4px}
+.detail-panel .role{font-size:13px;color:var(--text2);margin-bottom:14px}
+.detail-section{margin-bottom:16px}
+.detail-section label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px}
+.detail-log{font-size:13px;color:var(--text2)}
+.detail-log-item{padding:5px 0;border-bottom:1px solid var(--border)}
+.detail-log-item:last-child{border-bottom:none}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-state h3{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text2);margin-bottom:8px}
+select option{background:var(--surface2)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div style="display:flex;align-items:baseline">
+    <div class="logo">Niral</div>
+    <div class="hdr-sub">job search</div>
+  </div>
+  <div class="hdr-stats" id="hdrStats"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="kanban">Board</div>
+  <div class="tab" data-tab="list">List</div>
+  <div class="tab" data-tab="outreach">Outreach</div>
+  <div class="tab" data-tab="firms">Firms</div>
+  <div class="tab" data-tab="data">Data</div>
+</div>
+
+<div class="content" id="content"></div>
+<div class="toast" id="toast"></div>
+<div id="modalRoot"></div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const KEY = 'niral_tracker_v4';
+const OKEY = 'niral_outreach_v1';
+
+function defaultState() {
+  return {
+    nextId: 1,
+    jobs: [],
+    firms: [],
+    contracts: [],
+    tab: 'kanban'
+  };
+}
+
+function defaultOutreach() {
+  return {
+    nextId: 1,
+    contacts: [],
+    chatHistory: [] // global chat, not per-contact
+  };
+}
+
+let S = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || defaultState(); } catch(e) { return defaultState(); }})();
+let O = (() => { try { return JSON.parse(localStorage.getItem(OKEY)) || defaultOutreach(); } catch(e) { return defaultOutreach(); }})();
+let selectedContactId = null;
+
+function save() { localStorage.setItem(KEY, JSON.stringify(S)); }
+function saveO() { localStorage.setItem(OKEY, JSON.stringify(O)); }
+
+// ── UTILITIES ─────────────────────────────────────────────────────────────────
+const STATUSES = ['To Apply','Applied','In Progress','Interviewing','Rejected'];
+const TIER_COLORS = {'Tier 1':'#c8f53c','Tier 2':'#5b8fff','Tier 3':'#a78bfa','Longshot':'#ff9f43','Watch':'#9aa0ae'};
+const STATUS_COLORS = {'To Apply':'#5b8fff','Applied':'#a78bfa','In Progress':'#ff9f43','Interviewing':'#4ade80','Rejected':'#ff5a5f'};
+const TMPL_TYPES = {'T1':'Cold — industry conversation','T1b':'Cold — non-lawyer','T2':'Cold — open role','T3':'Warm — personal connection','T4':'Westinghouse specific','T5':'Follow-up'};
+
+function tid() { return ++S.nextId; }
+function oid() { return ++O.nextId; }
+function fmt(d) { if(!d) return ''; try { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric'}); } catch(e){return d;} }
+function daysAgo(d) { if(!d) return 999; return Math.floor((Date.now()-new Date(d))/(86400000)); }
+
+function toast(msg, dur=2800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+function badge(text, color) {
+  return `<span class="badge" style="background:${color}22;color:${color}">${text}</span>`;
+}
+
+// ── HEADER STATS ──────────────────────────────────────────────────────────────
+function renderStats() {
+  const active = S.jobs.filter(j=>!j.archived);
+  const interviewing = active.filter(j=>j.status==='Interviewing').length;
+  const applied = active.filter(j=>['Applied','In Progress','Interviewing'].includes(j.status)).length;
+  const outreachCount = O.contacts.length;
+  document.getElementById('hdrStats').innerHTML = `
+    <div class="stat"><b>${active.length}</b> roles</div>
+    <div class="stat"><b>${applied}</b> active</div>
+    <div class="stat"><b>${interviewing}</b> interviewing</div>
+    <div class="stat"><b>${outreachCount}</b> outreach</div>`;
+}
+
+// ── TAB ROUTING ───────────────────────────────────────────────────────────────
+function renderContent() {
+  renderStats();
+  const tab = S.tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  const c = document.getElementById('content');
+  if (tab==='kanban') renderKanban(c);
+  else if (tab==='list') renderList(c);
+  else if (tab==='outreach') renderOutreach(c);
+  else if (tab==='firms') renderFirms(c);
+  else if (tab==='data') renderData(c);
+}
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{ S.tab=t.dataset.tab; save(); renderContent(); });
+});
+
+// ── KANBAN ────────────────────────────────────────────────────────────────────
+function renderKanban(c) {
+  const jobs = S.jobs.filter(j=>!j.archived);
+  const cols = STATUSES.map(status=>{
+    const cards = jobs.filter(j=>j.status===status);
+    return `<div>
+      <div class="col-head">${status} <span>${cards.length}</span></div>
+      ${cards.map(j=>`
+        <div class="card" onclick="openJob(${j.id})">
+          <div class="card-co">${j.company||'—'}</div>
+          <div class="card-role">${j.role||'—'}</div>
+          <div class="card-meta">
+            ${j.tier ? badge(j.tier, TIER_COLORS[j.tier]||'#9aa0ae') : ''}
+            ${j.location ? `<span style="font-size:11px;color:var(--text3)">${j.location}</span>` : ''}
+            ${j.contact ? `<span class="dot-contact" title="${j.contact}"></span>` : ''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+  });
+  c.innerHTML = `<div class="kanban">${cols.join('')}</div>
+    <div style="margin-top:20px;display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="openJob(null)">+ Add Role</button>
+    </div>`;
+}
+
+// ── LIST ──────────────────────────────────────────────────────────────────────
+function renderList(c) {
+  const jobs = S.jobs.filter(j=>!j.archived);
+  c.innerHTML = `<div style="margin-bottom:14px;display:flex;gap:10px">
+    <button class="btn btn-primary" onclick="openJob(null)">+ Add Role</button>
+  </div>
+  <div style="overflow-x:auto"><table class="list-tbl">
+    <thead><tr>
+      <th>Company</th><th>Role</th><th>Status</th><th>Tier</th>
+      <th>Resume</th><th>Location</th><th>Updated</th><th></th>
+    </tr></thead>
+    <tbody>${jobs.map(j=>`<tr>
+      <td><b>${j.company||'—'}</b></td>
+      <td>${j.role||'—'}</td>
+      <td>${badge(j.status||'—', STATUS_COLORS[j.status]||'#9aa0ae')}</td>
+      <td>${j.tier ? badge(j.tier, TIER_COLORS[j.tier]||'#9aa0ae') : '—'}</td>
+      <td style="font-size:12px;color:var(--text2)">${j.resume||'—'}</td>
+      <td style="font-size:12px;color:var(--text2)">${j.location||'—'}</td>
+      <td style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${fmt(j.updated)}</td>
+      <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="openJob(${j.id})">Edit</button></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── JOB MODAL ────────────────────────────────────────────────────────────────
+function openJob(id) {
+  const job = id ? S.jobs.find(j=>j.id===id) : null;
+  const isNew = !job;
+  const j = job || {id:null,company:'',role:'',status:'To Apply',tier:'',location:'',url:'',resume:'',notes:'',contact:'',log:[]};
+
+  document.getElementById('modalRoot').innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">${isNew?'New Role':j.company}</div>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-row">
+          <div class="field"><label>Company</label><input id="f_co" value="${esc(j.company)}"></div>
+          <div class="field"><label>Role</label><input id="f_role" value="${esc(j.role)}"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Status</label><select id="f_status">${STATUSES.map(s=>`<option${s===j.status?' selected':''}>${s}</option>`).join('')}</select></div>
+          <div class="field"><label>Tier</label><select id="f_tier"><option value="">—</option>${['Tier 1','Tier 2','Tier 3','Longshot','Watch'].map(t=>`<option${t===j.tier?' selected':''}>${t}</option>`).join('')}</select></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Location</label><input id="f_loc" value="${esc(j.location)}"></div>
+          <div class="field"><label>Resume Version</label><input id="f_res" placeholder="e.g. Renewables Mar2026" value="${esc(j.resume)}"></div>
+        </div>
+        <div class="field"><label>URL</label><input id="f_url" placeholder="Job posting URL" value="${esc(j.url)}"></div>
+        <div class="field"><label>Contact / Connection</label><input id="f_contact" placeholder="Name at company" value="${esc(j.contact)}"></div>
+        <div class="field"><label>Notes</label><textarea id="f_notes">${esc(j.notes)}</textarea></div>
+        <div class="field">
+          <label>Interaction Log</label>
+          ${(j.log||[]).map(l=>`<div class="log-item"><div class="log-date">${fmt(l.date)}</div>${esc(l.text)}</div>`).join('')}
+          <div class="log-add">
+            <input id="logInput" placeholder="Add a note..." onkeydown="if(event.key==='Enter')addLog(${j.id||'null'})">
+            <button class="btn btn-ghost" onclick="addLog(${j.id||'null'})">Add</button>
+          </div>
+        </div>
+        <div class="btn-row">
+          ${!isNew?`<button class="btn btn-danger" onclick="archiveJob(${j.id})">Archive</button>`:''}
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveJob(${j.id||'null'})">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function addLog(id) {
+  const input = document.getElementById('logInput');
+  if (!input||!input.value.trim()) return;
+  if (id) {
+    const j = S.jobs.find(x=>x.id===id);
+    if (j) { if(!j.log)j.log=[]; j.log.unshift({date:new Date().toISOString(),text:input.value.trim()}); j.updated=new Date().toISOString(); save(); }
+  }
+  input.value='';
+  if (id) openJob(id);
+}
+
+function saveJob(id) {
+  const updated = {
+    id: id||tid(),
+    company: document.getElementById('f_co').value.trim(),
+    role: document.getElementById('f_role').value.trim(),
+    status: document.getElementById('f_status').value,
+    tier: document.getElementById('f_tier').value,
+    location: document.getElementById('f_loc').value.trim(),
+    resume: document.getElementById('f_res').value.trim(),
+    url: document.getElementById('f_url').value.trim(),
+    contact: document.getElementById('f_contact').value.trim(),
+    notes: document.getElementById('f_notes').value.trim(),
+    updated: new Date().toISOString(),
+    archived: false
+  };
+  if (!id) {
+    updated.log = [];
+    S.jobs.push(updated);
+    toast(`✓ ${updated.company} added`);
+  } else {
+    const idx = S.jobs.findIndex(x=>x.id===id);
+    if (idx>=0) { updated.log = S.jobs[idx].log||[]; S.jobs[idx]=updated; }
+    toast(`✓ ${updated.company} saved`);
+  }
+  save(); closeModal(); renderContent();
+}
+
+function archiveJob(id) {
+  const j = S.jobs.find(x=>x.id===id);
+  if (j) { j.archived=true; save(); toast('Archived'); closeModal(); renderContent(); }
+}
+
+function closeModal() { document.getElementById('modalRoot').innerHTML=''; }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── OUTREACH TAB ──────────────────────────────────────────────────────────────
+function renderOutreach(c) {
+  const contacts = O.contacts;
+  const sel = selectedContactId ? O.contacts.find(x=>x.id===selectedContactId) : null;
+
+  const listItems = contacts.length===0
+    ? `<div class="empty-state" style="padding:40px 20px"><p style="color:var(--text3);font-size:13px">No contacts yet. Tell me who to add.</p></div>`
+    : contacts.map(ct=>{
+        const lastLog = ct.log&&ct.log.length ? ct.log[0] : null;
+        const days = lastLog ? daysAgo(lastLog.date) : (ct.created ? daysAgo(ct.created) : null);
+        const statusColor = {'New':'#5b8fff','Reached out':'#ff9f43','Responded':'#4ade80','Call scheduled':'#c8f53c','Passed':'#ff5a5f','Ongoing':'#2dd4bf'}[ct.status]||'#9aa0ae';
+        return `<div class="oitem${ct.id===selectedContactId?' selected':''}" onclick="selectContact(${ct.id})">
+          <div class="oitem-co">${esc(ct.company)}</div>
+          <div class="oitem-name">${esc(ct.name)} · <span style="color:var(--text3)">${esc(ct.title||'')}</span></div>
+          <div class="oitem-meta">
+            ${badge(ct.status||'New', statusColor)}
+            ${ct.template ? badge(ct.template, '#5e6676') : ''}
+            <span class="oitem-since">${days!==null?(days===0?'today':days+'d ago'):''}</span>
+          </div>
+        </div>`;
+      }).join('');
+
+  const detailPanel = sel ? `
+    <div class="detail-panel">
+      <h3>${esc(sel.name)}</h3>
+      <div class="role">${esc(sel.title||'')}${sel.title&&sel.company?' · ':''}${esc(sel.company||'')}</div>
+      ${sel.linkedinUrl?`<div style="margin-bottom:12px"><a href="${esc(sel.linkedinUrl)}" target="_blank" style="font-size:12px;color:var(--blue)">LinkedIn profile ↗</a></div>`:''}
+      <div class="detail-section">
+        <label>Status</label>
+        <select onchange="updateContactField(${sel.id},'status',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:5px 8px;color:var(--text);font-size:13px;width:100%">
+          ${['New','Reached out','Responded','Call scheduled','Passed','Ongoing'].map(s=>`<option${s===sel.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="detail-section">
+        <label>Template used</label>
+        <select onchange="updateContactField(${sel.id},'template',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:5px 8px;color:var(--text);font-size:13px;width:100%">
+          <option value="">—</option>
+          ${Object.entries(TMPL_TYPES).map(([k,v])=>`<option value="${k}"${sel.template===k?' selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="detail-section">
+        <label>Notes</label>
+        <textarea onblur="updateContactField(${sel.id},'notes',this.value)" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:7px 9px;color:var(--text);font-size:13px;resize:vertical;min-height:70px;font-family:'DM Sans',sans-serif">${esc(sel.notes||'')}</textarea>
+      </div>
+      <div class="detail-section">
+        <label>Log</label>
+        <div class="detail-log">
+          ${(sel.log||[]).map(l=>`<div class="detail-log-item"><span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${fmt(l.date)}</span> — ${esc(l.text)}</div>`).join('')||'<div style="color:var(--text3);font-size:12px">No entries yet.</div>'}
+        </div>
+        <div class="log-add" style="margin-top:8px">
+          <input id="oLogInput" placeholder="Add log entry..." onkeydown="if(event.key==='Enter')addOutreachLog(${sel.id})">
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 10px" onclick="addOutreachLog(${sel.id})">Add</button>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <button class="btn btn-ghost" style="font-size:12px" onclick="editContact(${sel.id})">Edit contact</button>
+        <button class="btn btn-danger" style="font-size:12px" onclick="deleteContact(${sel.id})">Remove</button>
+      </div>
+    </div>` : `
+    <div class="detail-panel">
+      <div class="empty-state" style="padding:30px 10px">
+        <h3>Select a contact</h3>
+        <p style="font-size:13px;color:var(--text3)">or use the chat to add one</p>
+      </div>
+    </div>`;
+
+  c.innerHTML = `
+    <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center">
+      <button class="btn btn-primary" onclick="openContactModal(null)">+ Add Contact</button>
+      <span style="font-size:12px;color:var(--text3)">${contacts.length} contact${contacts.length!==1?'s':''}</span>
+    </div>
+    <div class="outreach-layout">
+      <div>
+        <div class="outreach-list">
+          <div class="outreach-list-head">
+            <h3>Contacts</h3>
+            <span style="font-size:12px;color:var(--text3)">${contacts.filter(c=>c.status==='New'||c.status==='Reached out').length} active</span>
+          </div>
+          ${listItems}
+        </div>
+        <div style="margin-top:14px">${detailPanel}</div>
+      </div>
+      <div style="position:sticky;top:80px">${buildChatPane()}</div>
+    </div>`;
+
+  // re-attach chat listeners
+  attachChatListeners();
+}
+
+function selectContact(id) {
+  selectedContactId = id;
+  renderContent();
+}
+
+function updateContactField(id, field, value) {
+  const ct = O.contacts.find(x=>x.id===id);
+  if (ct) { ct[field]=value; saveO(); renderStats(); }
+}
+
+function addOutreachLog(id) {
+  const input = document.getElementById('oLogInput');
+  if (!input||!input.value.trim()) return;
+  const ct = O.contacts.find(x=>x.id===id);
+  if (ct) {
+    if(!ct.log)ct.log=[];
+    ct.log.unshift({date:new Date().toISOString(),text:input.value.trim()});
+    saveO(); renderContent();
+  }
+}
+
+function deleteContact(id) {
+  if (!confirm('Remove this contact?')) return;
+  O.contacts = O.contacts.filter(x=>x.id!==id);
+  if (selectedContactId===id) selectedContactId=null;
+  saveO(); toast('Removed'); renderContent();
+}
+
+function openContactModal(id) {
+  const ct = id ? O.contacts.find(x=>x.id===id) : null;
+  const c = ct||{name:'',title:'',company:'',linkedinUrl:'',status:'New',template:'',notes:''};
+  document.getElementById('modalRoot').innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">${id?'Edit Contact':'New Contact'}</div>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="field-row">
+          <div class="field"><label>Name</label><input id="oc_name" value="${esc(c.name)}"></div>
+          <div class="field"><label>Title</label><input id="oc_title" value="${esc(c.title||'')}"></div>
+        </div>
+        <div class="field"><label>Company</label><input id="oc_co" value="${esc(c.company||'')}"></div>
+        <div class="field"><label>LinkedIn URL</label><input id="oc_li" placeholder="https://linkedin.com/in/..." value="${esc(c.linkedinUrl||'')}"></div>
+        <div class="field-row">
+          <div class="field"><label>Status</label><select id="oc_status">${['New','Reached out','Responded','Call scheduled','Passed','Ongoing'].map(s=>`<option${s===c.status?' selected':''}>${s}</option>`).join('')}</select></div>
+          <div class="field"><label>Template</label><select id="oc_tmpl"><option value="">—</option>${Object.entries(TMPL_TYPES).map(([k,v])=>`<option value="${k}"${c.template===k?' selected':''}>${v}</option>`).join('')}</select></div>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="oc_notes">${esc(c.notes||'')}</textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveContact(${id||'null'})">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function editContact(id) { openContactModal(id); }
+
+function saveContact(id) {
+  const updated = {
+    id: id||oid(),
+    name: document.getElementById('oc_name').value.trim(),
+    title: document.getElementById('oc_title').value.trim(),
+    company: document.getElementById('oc_co').value.trim(),
+    linkedinUrl: document.getElementById('oc_li').value.trim(),
+    status: document.getElementById('oc_status').value,
+    template: document.getElementById('oc_tmpl').value,
+    notes: document.getElementById('oc_notes').value.trim(),
+    created: new Date().toISOString()
+  };
+  if (!id) {
+    updated.log = [];
+    O.contacts.push(updated);
+    selectedContactId = updated.id;
+    toast(`✓ ${updated.name} added`);
+  } else {
+    const idx = O.contacts.findIndex(x=>x.id===id);
+    if (idx>=0) { updated.log = O.contacts[idx].log||[]; O.contacts[idx]=updated; }
+    toast(`✓ Saved`);
+  }
+  saveO(); closeModal(); renderContent();
+}
+
+// ── CHAT PANE ────────────────────────────────────────────────────────────────
+function buildChatPane() {
+  const msgs = O.chatHistory.slice(-30);
+  const msgsHtml = msgs.length===0
+    ? `<div style="color:var(--text3);font-size:12px;text-align:center;margin-top:20px">Tell me who to add, update, or find.<br><br><span style="font-size:11px;opacity:.7">e.g. "Add Sarah Chen, GC at Clearway Energy"<br>"Mark the Equinor contact as responded"<br>"Who haven't I followed up with?"</span></div>`
+    : msgs.map(m=>`<div class="chat-msg ${m.role}">${esc(m.content)}</div>`).join('');
+  return `<div class="chat-pane">
+    <div class="chat-head">
+      <h3>✦ Outreach assistant</h3>
+      <p>Add contacts, log updates, get reminders</p>
+    </div>
+    <div class="chat-msgs" id="chatMsgs">${msgsHtml}</div>
+    <div class="chat-input-row">
+      <input id="chatInput" placeholder="Tell me what happened..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">→</button>
+    </div>
+  </div>`;
+}
+
+function attachChatListeners() {
+  const msgs = document.getElementById('chatMsgs');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  if (!input||!input.value.trim()) return;
+  const userMsg = input.value.trim();
+  input.value = '';
+
+  O.chatHistory.push({role:'user', content:userMsg});
+  saveO();
+
+  // Optimistically render user msg
+  const msgs = document.getElementById('chatMsgs');
+  if (msgs) {
+    msgs.innerHTML += `<div class="chat-msg user">${esc(userMsg)}</div>
+      <div class="chat-msg ai thinking" id="thinking">Thinking...</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  // Build context
+  const contactsJson = JSON.stringify(O.contacts.map(c=>({
+    id:c.id, name:c.name, title:c.title, company:c.company,
+    status:c.status, template:c.template, notes:c.notes,
+    lastContact: c.log&&c.log.length ? c.log[0].date : c.created,
+    logCount: (c.log||[]).length
+  })));
+
+  const systemPrompt = `You are Niral's outreach tracking assistant. Niral is a corporate attorney (Cadwalader, Weil Gotshal background, 10+ years M&A/capital markets) pivoting into the energy transition sector. He is tracking outreach to legal and business contacts at clean energy companies.
+
+Current contacts: ${contactsJson}
+
+Today's date: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+
+Your job:
+1. Parse what Niral tells you and return a JSON action + a short plain-text response.
+2. Respond ONLY with a JSON object in this exact format (no markdown, no backticks):
+{"action":"none|add|update|log|delete|query","data":{},"message":"Your plain text response to show in chat"}
+
+Action types:
+- "add": add a new contact. data: {name, title, company, linkedinUrl, status, template, notes}
+- "update": update fields on existing contact. data: {id, ...fields to update}
+- "log": add a log entry to a contact. data: {id, text}
+- "delete": remove a contact. data: {id}
+- "query": answer a question (no data changes). data: {}
+- "none": general conversation. data: {}
+
+For "add", infer status from context ("reached out" → "Reached out", etc).
+For "update"/"log", match the contact by name or company from the contacts list.
+For "query" requests like "who haven't I followed up with", analyze the contacts data and answer in message.
+Always be concise. message should be 1-3 sentences max.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':'',
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:600,
+        system: systemPrompt,
+        messages: [
+          ...O.chatHistory.slice(-8).map(m=>({role:m.role,content:m.content}))
+        ]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text||'{}';
+
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch(e) { parsed = {action:'none', data:{}, message: raw.substring(0,200)}; }
+
+    const aiMsg = parsed.message || 'Done.';
+    O.chatHistory.push({role:'assistant', content:aiMsg});
+
+    // Apply action
+    if (parsed.action==='add' && parsed.data) {
+      const ct = {
+        id: oid(),
+        name: parsed.data.name||'',
+        title: parsed.data.title||'',
+        company: parsed.data.company||'',
+        linkedinUrl: parsed.data.linkedinUrl||'',
+        status: parsed.data.status||'New',
+        template: parsed.data.template||'',
+        notes: parsed.data.notes||'',
+        log: [],
+        created: new Date().toISOString()
+      };
+      O.contacts.push(ct);
+      selectedContactId = ct.id;
+      toast(`✓ Added ${ct.name}`);
+    } else if (parsed.action==='update' && parsed.data?.id) {
+      const ct = O.contacts.find(x=>x.id===parsed.data.id);
+      if (ct) { Object.assign(ct, parsed.data); toast('✓ Updated'); }
+    } else if (parsed.action==='log' && parsed.data?.id) {
+      const ct = O.contacts.find(x=>x.id===parsed.data.id);
+      if (ct) {
+        if(!ct.log)ct.log=[];
+        ct.log.unshift({date:new Date().toISOString(), text:parsed.data.text||''});
+        toast('✓ Logged');
+      }
+    } else if (parsed.action==='delete' && parsed.data?.id) {
+      O.contacts = O.contacts.filter(x=>x.id!==parsed.data.id);
+      if (selectedContactId===parsed.data.id) selectedContactId=null;
+      toast('Removed');
+    }
+
+    saveO();
+    renderContent();
+
+  } catch(err) {
+    O.chatHistory.push({role:'assistant', content:'Could not reach AI. You can still manage contacts manually with the + Add Contact button.'});
+    saveO();
+    const t = document.getElementById('thinking');
+    if (t) t.textContent='Could not reach AI.';
+    const msgs2 = document.getElementById('chatMsgs');
+    if (msgs2) msgs2.scrollTop = msgs2.scrollHeight;
+  }
+}
+
+// ── FIRMS ─────────────────────────────────────────────────────────────────────
+function renderFirms(c) {
+  c.innerHTML = `<div style="margin-bottom:14px"><button class="btn btn-primary" onclick="openFirmModal(null)">+ Add Firm</button></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+  ${S.firms.map(f=>`<div class="card" onclick="openFirmModal(${f.id})" style="cursor:pointer">
+    <div class="card-co">${esc(f.firm)}</div>
+    <div class="card-role">${esc(f.contact||'')}</div>
+    <div class="card-meta">${badge(f.status||'—','#9aa0ae')}</div>
+    ${f.notes?`<div style="font-size:12px;color:var(--text3);margin-top:8px">${esc(f.notes).substring(0,80)}</div>`:''}
+  </div>`).join('')}
+  </div>`;
+}
+
+function openFirmModal(id) {
+  const f = id ? S.firms.find(x=>x.id===id) : null;
+  const firm = f||{firm:'',contact:'',status:'Active',url:'',notes:''};
+  document.getElementById('modalRoot').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-head"><div class="modal-title">${id?'Edit Firm':'New Firm'}</div><button class="modal-close" onclick="closeModal()">×</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Firm</label><input id="ff_firm" value="${esc(firm.firm)}"></div>
+        <div class="field"><label>Contact / Recruiter</label><input id="ff_contact" value="${esc(firm.contact||'')}"></div>
+        <div class="field"><label>Status</label><select id="ff_status">${['Active','Applied','Interviewing','Passed','Dormant'].map(s=>`<option${s===firm.status?' selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>URL</label><input id="ff_url" value="${esc(firm.url||'')}"></div>
+        <div class="field"><label>Notes</label><textarea id="ff_notes">${esc(firm.notes||'')}</textarea></div>
+        <div class="btn-row">
+          ${id?`<button class="btn btn-danger" onclick="deleteFirm(${id})">Delete</button>`:''}
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveFirm(${id||'null'})">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveFirm(id) {
+  const updated={id:id||tid(),firm:document.getElementById('ff_firm').value.trim(),contact:document.getElementById('ff_contact').value.trim(),status:document.getElementById('ff_status').value,url:document.getElementById('ff_url').value.trim(),notes:document.getElementById('ff_notes').value.trim()};
+  if(!id){S.firms.push(updated);toast(`✓ ${updated.firm} added`);}
+  else{const i=S.firms.findIndex(x=>x.id===id);if(i>=0)S.firms[i]=updated;toast('✓ Saved');}
+  save();closeModal();renderContent();
+}
+function deleteFirm(id){S.firms=S.firms.filter(x=>x.id!==id);save();toast('Deleted');closeModal();renderContent();}
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+function renderData(c) {
+  c.innerHTML=`<div style="display:flex;flex-direction:column;gap:16px;max-width:500px">
+    <div class="card">
+      <div style="font-weight:500;margin-bottom:10px">Export / Import</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="exportData()">Export JSON</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">Import JSON</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        <button class="btn btn-danger" onclick="if(confirm('Clear all data?')){localStorage.removeItem('${KEY}');localStorage.removeItem('${OKEY}');location.reload()}">Clear All</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-weight:500;margin-bottom:8px">Stats</div>
+      <div style="font-size:13px;color:var(--text2);line-height:2">
+        Jobs tracked: <b style="color:var(--text)">${S.jobs.filter(j=>!j.archived).length}</b><br>
+        Firms tracked: <b style="color:var(--text)">${S.firms.length}</b><br>
+        Outreach contacts: <b style="color:var(--text)">${O.contacts.length}</b><br>
+        Chat messages: <b style="color:var(--text)">${O.chatHistory.length}</b>
+      </div>
+    </div>
+  </div>`;
+}
+
+function exportData() {
+  const blob=new Blob([JSON.stringify({jobs:S,outreach:O},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`niral-tracker-${new Date().toISOString().slice(0,10)}.json`;a.click();
+}
+function importData(e) {
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.jobs)S=d.jobs;if(d.outreach)O=d.outreach;save();saveO();toast('✓ Imported');renderContent();}catch(err){toast('Import failed');}};
+  r.readAsText(f);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderContent();
+</script>
+</body>
+</html>
